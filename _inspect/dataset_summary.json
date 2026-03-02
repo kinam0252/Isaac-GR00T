@@ -1,0 +1,133 @@
+{
+  "dataset_root": "/datasets/lerobot/pickMushroom_train",
+  "meta": {
+    "info": {
+      "format": "gr00t_lerobot_v2",
+      "version": "2.0",
+      "num_episodes": 150,
+      "robot": "franka",
+      "task": "Pick up the white object",
+      "fps": 20.000019073504518,
+      "state_dim": 8,
+      "action_dim": 7,
+      "videos": [
+        "ego_view",
+        "left_view",
+        "right_view"
+      ],
+      "features": {
+        "observation.state": {
+          "dtype": "float32",
+          "shape": [
+            8
+          ]
+        },
+        "action": {
+          "dtype": "float32",
+          "shape": [
+            7
+          ]
+        },
+        "timestamp": {
+          "dtype": "float64",
+          "shape": []
+        },
+        "annotation.human.action.task_description": {
+          "dtype": "int32",
+          "shape": []
+        },
+        "annotation.human.validity": {
+          "dtype": "int32",
+          "shape": []
+        },
+        "episode_index": {
+          "dtype": "unknown",
+          "shape": []
+        },
+        "frame_index": {
+          "dtype": "unknown",
+          "shape": []
+        },
+        "index": {
+          "dtype": "unknown",
+          "shape": []
+        },
+        "task_index": {
+          "dtype": "unknown",
+          "shape": []
+        },
+        "next.reward": {
+          "dtype": "unknown",
+          "shape": []
+        },
+        "next.done": {
+          "dtype": "unknown",
+          "shape": []
+        }
+      },
+      "data_path": "data/chunk-{episode_chunk:03d}/episode_{episode_index:06d}.parquet",
+      "video_path": "videos/chunk-{episode_chunk:03d}/observation.images.{video_key}/episode_{episode_index:06d}.mp4",
+      "codebase_version": "v2.0",
+      "robot_type": "franka",
+      "total_episodes": 150,
+      "total_frames": 15320,
+      "total_tasks": 1,
+      "total_chunks": 1,
+      "chunks_size": 1000,
+      "splits": {
+        "train": "0:150"
+      }
+    },
+    "num_tasks": 1,
+    "num_episodes": 150
+  },
+  "keys_from_meta_modality_json": {
+    "video_keys": [
+      "ego_view",
+      "left_view",
+      "right_view"
+    ],
+    "state_keys": [
+      "proprio.joint_pos",
+      "proprio.gripper_pos"
+    ],
+    "action_keys": [
+      "action.ee_delta",
+      "action.gripper_pos"
+    ],
+    "annotation_keys": [
+      "human.action.task_description",
+      "human.validity"
+    ],
+    "language_keys_suggested": [
+      "human.action.task_description"
+    ],
+    "action_representation_hint": "LIKELY_RELATIVE_ALREADY (dataset action looks like deltas)"
+  },
+  "videos_on_disk": {
+    "observation_images_dirs": [
+      "observation.images.ego_view",
+      "observation.images.left_view",
+      "observation.images.right_view"
+    ]
+  },
+  "parquet_probe": {
+    "first_parquet": "/datasets/lerobot/pickMushroom_train/data/chunk-000/episode_000000.parquet",
+    "columns": [
+      "observation.state",
+      "action",
+      "timestamp",
+      "annotation.human.action.task_description",
+      "task_index",
+      "annotation.human.validity",
+      "episode_index",
+      "index",
+      "frame_index",
+      "next.reward",
+      "next.done"
+    ],
+    "num_rows": 109,
+    "state_dim": 8,
+    "action_dim": 7
+  }
+}
