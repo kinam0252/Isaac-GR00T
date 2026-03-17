@@ -166,14 +166,22 @@ class PolicyClient(BasePolicy):
 
     def _init_socket(self):
         """Initialize or reinitialize the socket with current settings"""
+        if hasattr(self, "socket"):
+            try:
+                self.socket.close(0)
+            except Exception:
+                pass
         self.socket = self.context.socket(zmq.REQ)
+        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket.setsockopt(zmq.RCVTIMEO, int(self.timeout_ms))
+        self.socket.setsockopt(zmq.SNDTIMEO, int(self.timeout_ms))
         self.socket.connect(f"tcp://{self.host}:{self.port}")
 
     def ping(self) -> bool:
         try:
             self.call_endpoint("ping", requires_input=False)
             return True
-        except zmq.error.ZMQError:
+        except (zmq.error.Again, zmq.error.ZMQError, TimeoutError):
             self._init_socket()  # Recreate socket for next attempt
             return False
 
@@ -199,9 +207,17 @@ class PolicyClient(BasePolicy):
             request["data"] = data
         if self.api_token:
             request["api_token"] = self.api_token
-
-        self.socket.send(MsgSerializer.to_bytes(request))
-        message = self.socket.recv()
+        try:
+            self.socket.send(MsgSerializer.to_bytes(request))
+            message = self.socket.recv()
+        except zmq.error.Again as err:
+            self._init_socket()
+            raise TimeoutError(
+                f"Timeout calling '{endpoint}' at {self.host}:{self.port} ({self.timeout_ms} ms)"
+            ) from err
+        except zmq.error.ZMQError:
+            self._init_socket()
+            raise
         if message == b"ERROR":
             raise RuntimeError("Server error. Make sure we are running the correct policy server.")
         response = MsgSerializer.from_bytes(message)

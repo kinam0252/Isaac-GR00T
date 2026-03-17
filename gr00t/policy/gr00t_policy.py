@@ -343,6 +343,14 @@ class Gr00tPolicy(BasePolicy):
             model_pred = self.model.get_action(**collated_inputs)
         normalized_action = model_pred["action_pred"].float()
 
+        # Extract VLM backbone features for RL integration (if available)
+        info = {}
+        if "backbone_features" in model_pred:
+            # backbone_features: [B, seq_len, hidden_dim] — VLM last hidden state
+            info["backbone_features"] = model_pred["backbone_features"].float()
+            if "backbone_attention_mask" in model_pred:
+                info["backbone_attention_mask"] = model_pred["backbone_attention_mask"]
+
         # Step 5: Decode actions from normalized space back to physical units
         batched_states = {}
         for k in self.modality_configs["state"].modality_keys:
@@ -355,7 +363,7 @@ class Gr00tPolicy(BasePolicy):
         casted_action = {
             key: value.astype(np.float32) for key, value in unnormalized_action.items()
         }
-        return casted_action, {}
+        return casted_action, info
 
     def check_action(self, action: dict[str, Any]) -> None:
         """Validate that the action has the correct structure and types.
